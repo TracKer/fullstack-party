@@ -2,6 +2,6 @@
     "require": {
         "slim/slim": "^3.8",
         "twig/twig": "^2.3",
-        "guzzlehttp/guzzle": "^6.2"
+        "league/oauth2-github": "^2.0"
     }
 }
