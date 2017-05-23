@@ -1,7 +1,8 @@
 <?php
 // DIC configuration
 $container = $app->getContainer();
-// view renderer
+
+// Twig service.
 $container['renderer'] = function ($c) {
   $paths = $c->get('settings')['renderer']['template_paths'];
   $loader = new \Twig_Loader_Filesystem($paths);
@@ -13,22 +14,5 @@ $container['renderer'] = function ($c) {
     'debug' => TRUE,
   ));
 
-//  $this->twig->addExtension(new Extension());
-//  $this->twig->addExtension(new FormsExtension());
-//
-//  if ($this->twig->isDebug()) {
-//    $this->twig->addExtension(new DebugPanelExtension());
-//  }
-
-
-
   return $twig;
 };
-// monolog
-//$container['logger'] = function ($c) {
-//  $settings = $c->get('settings')['logger'];
-//  $logger = new Monolog\Logger($settings['name']);
-//  $logger->pushProcessor(new Monolog\Processor\UidProcessor());
-//  $logger->pushHandler(new Monolog\Handler\StreamHandler($settings['path'], $settings['level']));
-//  return $logger;
-//};
