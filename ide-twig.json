@@ -1,0 +1,9 @@
+// Twig configuration for Symfony plugin in PHP Storm.
+{
+  "namespaces": [
+    // Global
+    {
+      "path": "templates"
+    }
+  ]
+}
