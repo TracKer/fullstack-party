@@ -1,5 +1,5 @@
 <?php
-// DIC configuration
+// Dependency Injection Container configuration.
 $container = $app->getContainer();
 
 // Twig service.
@@ -15,4 +15,14 @@ $container['twig'] = function ($c) {
   ));
 
   return $twig;
+};
+
+$container['guzzle'] = function ($c) {
+  return new GuzzleHttp\Client($c->get('settings')['guzzle']);
+};
+
+
+$container['github'] = function ($c) {
+  $provider = new \League\OAuth2\Client\Provider\Github($c->get('settings')['github']);
+  return $provider;
 };

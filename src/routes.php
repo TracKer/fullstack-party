@@ -1,5 +1,6 @@
 <?php
 
+use League\OAuth2\Client\Provider\Github;
 use League\OAuth2\Client\Provider\GithubResourceOwner;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -8,11 +9,8 @@ use Psr\Http\Message\ServerRequestInterface;
 
 // GitHub authorization.
 $app->get('/auth', function(ServerRequestInterface $request, ResponseInterface $response, $args) {
-  $provider = new \League\OAuth2\Client\Provider\Github([
-    'clientId' => '587b512a6831b5acae95',
-    'clientSecret' => '170da7bfe3a52a13d249c956fc0f9e921ea4d147',
-    'redirectUri' => 'http://tesonet-test.local/auth',
-  ]);
+  /** @var Github $provider */
+  $provider = $this->github;
 
   $query = $request->getQueryParams();
 
