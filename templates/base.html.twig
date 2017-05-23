@@ -1,8 +1,10 @@
 <html>
 <head>
-  <title>Title</title>
+  <title>{% block title %} Title {% endblock %}</title>
 </head>
 <body>
-  Content
+  {% block content %}
+    Content
+  {% endblock %}
 </body>
 </html>
