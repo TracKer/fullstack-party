@@ -3,8 +3,8 @@
 $container = $app->getContainer();
 
 // Twig service.
-$container['renderer'] = function ($c) {
-  $paths = $c->get('settings')['renderer']['template_paths'];
+$container['twig'] = function ($c) {
+  $paths = $c->get('settings')['twig']['template_paths'];
   $loader = new \Twig_Loader_Filesystem($paths);
 
   $twig = new Twig_Environment($loader, array(
