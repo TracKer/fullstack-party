@@ -21,8 +21,11 @@ $container['guzzle'] = function ($c) {
   return new GuzzleHttp\Client($c->get('settings')['guzzle']);
 };
 
-
 $container['github'] = function ($c) {
   $provider = new \League\OAuth2\Client\Provider\Github($c->get('settings')['github']);
   return $provider;
+};
+
+$container['githubApi'] = function ($c) {
+  return new \Helpers\GitHubApi($c->get('guzzle'), new \Helpers\ResponseCache());
 };
