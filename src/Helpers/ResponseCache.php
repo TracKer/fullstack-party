@@ -8,6 +8,9 @@ class ResponseCache {
   private $cache;
 
   public function __construct() {
+    if (!isset($_SESSION['response_cache'])) {
+      $_SESSION['response_cache'] = [];
+    }
     $this->cache = &$_SESSION['response_cache'];
     $this->cleanExpired();
   }
@@ -37,7 +40,15 @@ class ResponseCache {
     return $response;
   }
 
-  public function set(string $key, Response $response) {
+  /**
+   * Saves Response object to cache.
+   *
+   * @param string $key
+   *   Cache key.
+   * @param Response $response
+   *   Response object.
+   */
+  public function set(string $key, Response &$response) {
     $data = [
       'expire' => time() + 60*5,
       'data' => [
@@ -50,8 +61,12 @@ class ResponseCache {
     ];
 
     $this->cache[$key] = $data;
+    $response = $this->get($key);
   }
 
+  /**
+   * Removes expired objects from cache.
+   */
   public function cleanExpired() {
     $now = time();
     foreach ($this->cache as $key => $data) {
