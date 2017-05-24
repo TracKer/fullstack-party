@@ -97,4 +97,16 @@ class GitHubApi {
     return new PagerInfo($pagesCount, $issuesCount);
   }
 
+  public function getIssuesList(string $repo, string $state, int $page = 1, string $token = null) {
+    $response = $this->get("repos/{$repo}/issues?state={$state}&per_page=100&page={$page}", $token);
+    $data = json_decode($response->getBody()->getContents(), true);
+
+    // If data is empty of json parsing failed.
+    if ((!isset($data)) || empty($data)) {
+      return [];
+    }
+
+    return $data;
+  }
+
 }
