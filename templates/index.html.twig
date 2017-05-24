@@ -2,6 +2,11 @@
 
 {% block title %} Welcome {% endblock %}
 
+{% block bodyClasses %} page-login {% endblock %}
+
 {% block content %}
-  <a href="/auth">Login with GitHub</a>
+  <div class="block-login">
+    <div class="logo"></div>
+    <a href="/auth" class="btn btn-success btn-lg">Login With GitHub</a>
+  </div>
 {% endblock %}

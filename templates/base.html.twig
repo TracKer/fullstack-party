@@ -1,10 +1,11 @@
 <html>
 <head>
-  <title>{% block title %} Title {% endblock %}</title>
-</head>
-<body>
-  {% block content %}
-    Content
+  <title>{% block title %}Title{% endblock %}</title>
+  {% block stylesheets %}
+    <link rel="stylesheet" href="/dist/css/main.css"/>
   {% endblock %}
+</head>
+<body class="{% block bodyClasses %}{% endblock %}">
+  {% block content %}{% endblock %}
 </body>
 </html>

@@ -1,0 +1,26 @@
+body.page-login {
+  height: 100%;
+  background-image: url('../img/bg.jpg');
+  background-position: center center;
+  background-attachment: fixed;
+  background-size: cover;
+
+  .block-login {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    .logo {
+      height: 64px;
+      background-image: url('../img/logo.png');
+      background-position-x: right;
+      width: 246px;
+      margin: 0 auto 60px auto;
+    }
+
+    a {
+      width: 370px;
+    }
+  }
+}

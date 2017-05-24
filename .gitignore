@@ -1,3 +1,5 @@
 vendor
 .idea
 .sync
+public/dist
+node_modules
