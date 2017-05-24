@@ -28,14 +28,6 @@ $app->get('/auth', function(ServerRequestInterface $request, ResponseInterface $
     $token = $provider->getAccessToken('authorization_code', ['code' => $query['code']]);
     $_SESSION['token'] = $token;
 
-    try {
-      /** @var GithubResourceOwner $user */
-      $user = $provider->getResourceOwner($token);
-      $_SESSION['user'] = $user;
-    } catch (Exception $e) {
-      throw new Exception('Failed to get user details!');
-    }
-
     return $response->withStatus(302)->withHeader('Location', '/issues/open');
   }
 });
@@ -47,34 +39,52 @@ $app->get('/', function($request, $response, $args) {
   return $twig->render('index.html.twig', $args);
 });
 
-// Opened issues.
-$app->get('/issues/open', function(ServerRequestInterface $request, ResponseInterface $response, $args) {
+// Open issues.
+$app->get('/issues/open[/{page:[0-9]+}]', function(ServerRequestInterface $request, ResponseInterface $response, $args) {
   if (!isset($_SESSION['token'])) {
     return $response->withStatus(302)->withHeader('Location', '/');
   }
 
-  /** @var GithubResourceOwner $user */
-  $user = $_SESSION['user'];
+  $page = isset($args['page']) ? $args['page'] : 1;
+
+  /** @var \Helpers\GitHubApi $githubApi */
+  $githubApi = $this->githubApi;
+  $openPagerInfo = $githubApi->getPagerInfo('symfony/symfony', 'open', $_SESSION['token']);
+  $closedPagerInfo = $githubApi->getPagerInfo('symfony/symfony', 'closed', $_SESSION['token']);
+  $issues = $githubApi->getIssuesList('symfony/symfony', 'open', $page, $_SESSION['token']);
 
   /** @var Twig_Environment $twig */
   $twig = $this->twig;
   return $twig->render('issues/open.html.twig', [
-    'user' => $user,
+    'issues' => $issues,
+    'currentPage' => $page,
+    'lastPage' => $openPagerInfo->pages,
+    'openIssues' => $openPagerInfo->issues,
+    'closedIssues' => $closedPagerInfo->issues,
   ]);
 });
 
 // Closed issues.
-$app->get('/issues/closed', function(ServerRequestInterface $request, ResponseInterface $response, $args) {
+$app->get('/issues/closed[/{page:[0-9]+}]', function(ServerRequestInterface $request, ResponseInterface $response, $args) {
   if (!isset($_SESSION['token'])) {
     return $response->withStatus(302)->withHeader('Location', '/');
   }
 
-  /** @var GithubResourceOwner $user */
-  $user = $_SESSION['user'];
+  $page = isset($args['page']) ? $args['page'] : 1;
+
+  /** @var \Helpers\GitHubApi $githubApi */
+  $githubApi = $this->githubApi;
+  $openPagerInfo = $githubApi->getPagerInfo('symfony/symfony', 'open', $_SESSION['token']);
+  $closedPagerInfo = $githubApi->getPagerInfo('symfony/symfony', 'closed', $_SESSION['token']);
+  $issues = $githubApi->getIssuesList('symfony/symfony', 'closed', $page, $_SESSION['token']);
 
   /** @var Twig_Environment $twig */
   $twig = $this->twig;
   return $twig->render('issues/closed.html.twig', [
-    'user' => $user,
+    'issues' => $issues,
+    'currentPage' => $page,
+    'lastPage' => $closedPagerInfo->pages,
+    'openIssues' => $openPagerInfo->issues,
+    'closedIssues' => $closedPagerInfo->issues,
   ]);
 });

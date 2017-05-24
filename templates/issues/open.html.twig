@@ -1,6 +1,17 @@
-{# @var user \League\OAuth2\Client\Provider\GithubResourceOwner #}
+{# @var issues array #}
+{# @var currentPage int #}
+{# @var lastPage int #}
+{# @var openIssues int #}
+{# @var closedIssues int #}
 {% extends 'base.html.twig' %}
 
+{% block title %} Open issues {% endblock %}
+
 {% block content %}
-  Open issues
+  <div>{{ openIssues }} Open</div>
+  <div>{{ closedIssues }} Closed</div>
+  <div>Current page: {{ currentPage }}</div>
+  <div>Last page: {{ lastPage }}</div>
+  <br><br>
+  {% include 'issues/pagination.html.twig' with {state: 'open'} %}
 {% endblock %}
