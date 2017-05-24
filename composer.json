@@ -4,5 +4,10 @@
         "twig/twig": "^2.3",
         "league/oauth2-github": "^2.0",
         "guzzlehttp/guzzle": "^6.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Helpers\\": "src/Helpers/"
+        }
     }
 }
