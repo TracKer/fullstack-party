@@ -39,52 +39,29 @@ $app->get('/', function($request, $response, $args) {
   return $twig->render('index.html.twig', $args);
 });
 
-// Open issues.
-$app->get('/issues/open[/{page:[0-9]+}]', function(ServerRequestInterface $request, ResponseInterface $response, $args) {
+// Issues list.
+$app->get('/issues/{state}[/{page:[0-9]+}]', function(ServerRequestInterface $request, ResponseInterface $response, $args) {
   if (!isset($_SESSION['token'])) {
     return $response->withStatus(302)->withHeader('Location', '/');
   }
 
+  $state = $args['state'];
   $page = isset($args['page']) ? $args['page'] : 1;
 
   /** @var \Helpers\GitHubApi $githubApi */
   $githubApi = $this->githubApi;
   $openPagerInfo = $githubApi->getPagerInfo('symfony/symfony', 'open', $_SESSION['token']);
   $closedPagerInfo = $githubApi->getPagerInfo('symfony/symfony', 'closed', $_SESSION['token']);
-  $issues = $githubApi->getIssuesList('symfony/symfony', 'open', $page, $_SESSION['token']);
+  $issues = $githubApi->getIssuesList('symfony/symfony', $state, $page, $_SESSION['token']);
 
   /** @var Twig_Environment $twig */
   $twig = $this->twig;
-  return $twig->render('issues/open.html.twig', [
+  return $twig->render('issues/list.html.twig', [
+    'state' => $state,
     'issues' => $issues,
     'currentPage' => $page,
-    'lastPage' => $openPagerInfo->pages,
-    'openIssues' => $openPagerInfo->issues,
-    'closedIssues' => $closedPagerInfo->issues,
-  ]);
-});
-
-// Closed issues.
-$app->get('/issues/closed[/{page:[0-9]+}]', function(ServerRequestInterface $request, ResponseInterface $response, $args) {
-  if (!isset($_SESSION['token'])) {
-    return $response->withStatus(302)->withHeader('Location', '/');
-  }
-
-  $page = isset($args['page']) ? $args['page'] : 1;
-
-  /** @var \Helpers\GitHubApi $githubApi */
-  $githubApi = $this->githubApi;
-  $openPagerInfo = $githubApi->getPagerInfo('symfony/symfony', 'open', $_SESSION['token']);
-  $closedPagerInfo = $githubApi->getPagerInfo('symfony/symfony', 'closed', $_SESSION['token']);
-  $issues = $githubApi->getIssuesList('symfony/symfony', 'closed', $page, $_SESSION['token']);
-
-  /** @var Twig_Environment $twig */
-  $twig = $this->twig;
-  return $twig->render('issues/closed.html.twig', [
-    'issues' => $issues,
-    'currentPage' => $page,
-    'lastPage' => $closedPagerInfo->pages,
-    'openIssues' => $openPagerInfo->issues,
-    'closedIssues' => $closedPagerInfo->issues,
+    'lastPage' => $state == 'open' ? $openPagerInfo->pages : $closedPagerInfo->pages,
+    'openIssuesCount' => $openPagerInfo->issues,
+    'closedIssuesCount' => $closedPagerInfo->issues,
   ]);
 });

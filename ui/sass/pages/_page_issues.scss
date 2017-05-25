@@ -38,7 +38,92 @@ body.page-issues {
   }
 
   .content {
+    .menu {
+      text-align: center;
+      margin: 30px 0;
 
+      a {
+        display: inline-block;
+        margin: 0 10px;
+        font-size: 14px;
+        line-height: 18px;
+        color: #808080;
+
+        &:hover, &.active {
+          color: #000;
+          text-decoration: none;
+        }
+
+        &:before {
+          content: ' ';
+          display: block;
+          float: left;
+          width: 16px;
+          height: 16px;
+          margin-right: 8px;
+          opacity: 0.5;
+          background-repeat: no-repeat;
+          background-position: left center;
+        }
+
+        &:hover:before, &.active:before {
+          opacity: 1;
+        }
+
+        &.open:before {
+          background-image: url('../img/icon-open.png');
+        }
+        &.closed:before {
+          background-image: url('../img/icon-closed.png');
+        }
+      }
+    }
+
+    .issue {
+      .main-block {
+        background-repeat: no-repeat;
+        background-position: 30px 3px;
+        padding-left: 60px;
+
+        &.open {
+          background-image: url('../img/icon-open-green.png');
+        }
+
+        &.closed {
+          background-image: url('../img/icon-closed-green.png');
+        }
+
+        .info {
+          font-size: 13px;
+          color: #bfbfbf;
+          margin-top: 10px;
+        }
+      }
+
+      .comments-block {
+        padding-top: 5px;
+      }
+
+      a.title {
+        font-size: 15px;
+        line-height: 22px;
+        color: #333;
+      }
+
+      a.comments {
+        font-size: 13px;
+        color: #999;
+        background-image: url('../img/icon-comments.png');
+        background-position: left top;
+        background-repeat: no-repeat;
+        line-height: 16px;
+        padding-left: 23px;
+      }
+
+      .label {
+        line-height: 22px;
+      }
+    }
   }
 
   .pagination {
@@ -46,7 +131,6 @@ body.page-issues {
     text-align: center;
 
     * {
-      //float: left;
       display: inline-block;
       height: 35px;
       line-height: 35px;
