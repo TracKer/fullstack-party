@@ -1,0 +1,119 @@
+body.page-issue {
+  background-color: #F5F5F5;
+
+  .header-row {
+    background-color: #fff;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-bottom-color: #E6E6E6;
+  }
+
+  .header {
+    height: 110px;
+
+    .logo {
+      float: left;
+      margin-top: 35px;
+      margin-left: 50px;
+      background-image: url('../img/logo-small.png');
+      background-repeat: no-repeat;
+      background-position: center;
+      width: 120px;
+      height: 40px;
+    }
+
+    a {
+      float: right;
+      display: block;
+      font-size: 16px;
+      line-height: 18px;
+      color: #313155;
+      background-image: url('../img/icon-logout.png');
+      background-position: left center;
+      background-repeat: no-repeat;
+      padding-left: 30px;
+      margin-top: 45px;
+      margin-right: 56px;
+    }
+  }
+
+  .content {
+    .menu {
+      text-align: left;
+      margin: 30px 0;
+
+      a {
+        display: inline-block;
+        font-size: 14px;
+        line-height: 18px;
+        color: #85b32b;
+
+        &:hover, &:focus {
+          color: #85b32b;
+          text-decoration: underline;
+        }
+
+        &:before {
+          content: ' ';
+          display: block;
+          float: left;
+          width: 15px;
+          height: 18px;
+          margin-right: 8px;
+          background-repeat: no-repeat;
+          background-position: left center;
+          background-image: url('../img/icon-back.png');
+        }
+      }
+    }
+
+    .top-block .panel-body {
+      padding: 30px;
+
+      h1 {
+        font-size: 30px;
+        color: #333333;
+        padding: 0;
+        margin: 0 0 20px 0;
+        font-weight: normal;
+
+        .issue-id {
+          color: #999999;
+        }
+      }
+
+      .main-state {
+        font-size: 21px;
+        font-weight: normal;
+        line-height: 40px;
+        margin-right: 20px;
+      }
+
+      .info {
+        font-size: 13px;
+        color: #999999;
+        line-height: 40px;
+      }
+    }
+  }
+
+  .comment {
+    .avatar-block {
+      text-align: right;
+      padding-right: 20px;
+    }
+
+    .panel-heading {
+      background-color: #fff;
+      font-size: 13px;
+      color: #999999;
+      line-height: 40px;
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    .panel-body {
+      padding: 30px;
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{# @var issue array #}
+{# @var referer string #}
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ issue.title }} {% endblock %}
+
+{% block bodyClasses %} page-issue {% endblock %}
+
+{% block content %}
+  <div class="container-fluid">
+    <div class="row header-row">
+      <div class="col-lg-12 header">
+        <div class="logo"></div>
+        <a href="/logout">Logout</a>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-offset-3 col-lg-6 content">
+
+        {% spaceless %}
+          <div class="menu">
+            <a href="{{ referer }}">Back to Issues</a>
+          </div>
+        {% endspaceless %}
+
+        <div class="panel panel-default top-block">
+          <div class="panel-body">
+            <h1>{{ issue.title }} <span class="issue-id">#{{ issue.number }}</span></h1>
+            {% if issue.state == 'open' %}
+              <span class="label label-success main-state">OPEN</span>
+            {% else %}
+              <span class="label label-danger main-state">CLOSED</span>
+            {% endif %}
+
+            <span class="info">
+              <a href="{{ issue.user.html_url }}">{{ issue.user.login }}</a>
+              {% if issue.state == 'open' %}
+                opened {{ issue.created_at|time_diff ? : 'just now' }}
+              {% else %}
+                closed {{ issue.closed_at|time_diff ? : 'just now' }}
+              {% endif %}
+              this issue · {{ issue.comments|length }} comments.
+            </span>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% for comment in issue.comments %}
+      <div class="row comment">
+        <div class="col-lg-offset-3 col-lg-1 avatar-block">
+          <img src="{{ comment.user.avatar_url ~ '&s=64' }}">
+        </div>
+        <div class="col-lg-5">
+          <div class="panel panel-default top-block">
+            <div class="panel-heading">
+              <a href="{{ comment.user.html_url }}">{{ comment.user.login }}</a>
+              commented {{ comment.created_at|time_diff ? : 'just now' }}
+            </div>
+            <div class="panel-body">
+              {{ comment.body|nl2br }}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+
+  </div>
+{% endblock %}

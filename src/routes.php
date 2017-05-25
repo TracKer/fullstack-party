@@ -65,3 +65,27 @@ $app->get('/issues/{state}[/{page:[0-9]+}]', function(ServerRequestInterface $re
     'closedIssuesCount' => $closedPagerInfo->issues,
   ]);
 });
+
+// Issue.
+$app->get('/issue/{id}', function(ServerRequestInterface $request, ResponseInterface $response, $args) {
+  if (!isset($_SESSION['token'])) {
+    return $response->withStatus(302)->withHeader('Location', '/');
+  }
+
+  /** @var \Helpers\GitHubApi $githubApi */
+  $githubApi = $this->githubApi;
+  $issue = $githubApi->getIssue('symfony/symfony', $args['id'], $_SESSION['token']);
+
+  if ($request->hasHeader('HTTP_REFERER')) {
+    $referer = reset($request->getHeader('HTTP_REFERER'));
+  } else {
+    $referer = '/issues/' . $issue['state'];
+  }
+
+  /** @var Twig_Environment $twig */
+  $twig = $this->twig;
+  return $twig->render('issue.html.twig', [
+    'issue' => $issue,
+    'referer' => $referer,
+  ]);
+});

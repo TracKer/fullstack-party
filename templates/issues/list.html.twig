@@ -6,7 +6,7 @@
 {# @var closedIssuesCount int #}
 {% extends 'base.html.twig' %}
 
-{% block title %} Open issues {% endblock %}
+{% block title %} {{ state == 'open' ? 'Open' : 'Closed' }} issues {% endblock %}
 
 {% block bodyClasses %} page-issues {% endblock %}
 
