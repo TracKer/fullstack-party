@@ -1,0 +1,80 @@
+body.page-issues {
+  background-color: #F5F5F5;
+
+  .header-row {
+    background-color: #fff;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-bottom-color: #E6E6E6;
+  }
+
+  .header {
+    height: 110px;
+
+    .logo {
+      float: left;
+      margin-top: 35px;
+      margin-left: 50px;
+      background-image: url('../img/logo-small.png');
+      background-repeat: no-repeat;
+      background-position: center;
+      width: 120px;
+      height: 40px;
+    }
+
+    a {
+      float: right;
+      display: block;
+      font-size: 16px;
+      line-height: 18px;
+      color: #313155;
+      background-image: url('../img/icon-logout.png');
+      background-position: left center;
+      background-repeat: no-repeat;
+      padding-left: 30px;
+      margin-top: 45px;
+      margin-right: 56px;
+    }
+  }
+
+  .content {
+
+  }
+
+  .pagination {
+    display: block;
+    text-align: center;
+
+    * {
+      //float: left;
+      display: inline-block;
+      height: 35px;
+      line-height: 35px;
+      text-align: center;
+      margin: 0 4px;
+    }
+
+    span.disabled {
+      color: #bbb;
+    }
+
+    a.num {
+      width: 35px;
+      color: #000;
+      border-radius: 50%;
+      background-color: #fff;
+      box-shadow: 0px 3px 1px -2px rgba(209,209,209,1);
+
+      &.active, &:hover {
+        color: #fff;
+        background-color: #9fd533;
+        box-shadow: none;
+      }
+
+      &:hover, &:focus {
+        text-decoration: none;
+      }
+
+    }
+  }
+}

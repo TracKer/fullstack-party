@@ -2,7 +2,12 @@ $brand-success: #9fd533;
 @import "../../node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
 
 @import "pages/page_login";
+@import "pages/page_issues";
 
 html {
   height: 100%;
+}
+
+a {
+  color: #9fd533;
 }
