@@ -14,6 +14,9 @@ $container['twig'] = function ($c) {
     'debug' => TRUE,
   ));
 
+  $twig->addExtension(new Twig_Extension_Debug());
+  $twig->addExtension(new Twig_Extensions_Extension_Date());
+
   return $twig;
 };
 
@@ -27,5 +30,5 @@ $container['github'] = function ($c) {
 };
 
 $container['githubApi'] = function ($c) {
-  return new \Helpers\GitHubApi($c->get('guzzle'), new \Helpers\ResponseCache());
+  return new \Helpers\GitHubApi($c->get('settings')['github_api'], $c->get('guzzle'), new \Helpers\ResponseCache());
 };
