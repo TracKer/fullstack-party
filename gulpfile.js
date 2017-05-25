@@ -7,9 +7,16 @@ gulp.task('img', function() {
     .pipe(gulp.dest('public/dist/img'));
 });
 
-gulp.task('default', ['img'], function() {
+gulp.task('sass', function() {
   gulp.src('ui/sass/**/*.scss')
     .pipe(sass())
     // .pipe(concat('main.css'))
     .pipe(gulp.dest('public/dist/css'));
+});
+
+gulp.task('default', ['sass', 'img'])
+
+gulp.task('watch', function() {
+  gulp.watch('ui/sass/**/*.scss', ['sass']);
+  gulp.watch('ui/img/**/*', ['img']);
 });
