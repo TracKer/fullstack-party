@@ -9,6 +9,12 @@ class GitHubApi {
   private $client;
   private $cache;
 
+  /**
+   * GitHubApi constructor.
+   * @param Client $client
+   *   Guzzle object.
+   * @param ResponseCache $cache
+   */
   public function __construct(Client $client, ResponseCache $cache) {
     $this->client = $client;
     $this->cache = $cache;
@@ -19,13 +25,17 @@ class GitHubApi {
    *
    * @param string $uri
    *   Uri.
+   * @param string[] $query
+   *   Query parameters.
    * @param string|null $token
    *   Access token.
    * @return Response
    *   Data.
    */
-  public function get(string $uri, string $token = null): Response {
-    $cacheKey = $uri;
+  public function get(string $uri, array $query = [], string $token = null): Response {
+    ksort($query);
+    $queryString = http_build_query($query);
+    $cacheKey = "{$uri}?$queryString";
 
     $response = $this->cache->get($cacheKey);
     if ($response !== null) {
@@ -33,36 +43,34 @@ class GitHubApi {
     }
 
     if (isset($token)) {
-      $uri = self::addTokenToUri($uri, $token);
+      $query['access_token'] = $token;
     }
 
     /** @var Response $response */
-    $response = $this->client->get($uri);
+    $response = $this->client->get($uri, ['query' => $query]);
     $this->cache->set($cacheKey, $response);
     return $response;
   }
 
   /**
-   * Appends token to the Uri.
+   * Gets pager information.
    *
-   * @param string $uri
-   *   Uri.
-   * @param string $token
-   *   Token.
-   * @return string
-   *   Uri with token.
+   * @param string $repo
+   *   Repository.
+   * @param string $state
+   *   Issue state 'open' or 'closed'.
+   * @param string|null $token
+   *   Access token.
+   * @return PagerInfo
+   *   Object with information about issues count and pages count.
    */
-  private static function addTokenToUri(string $uri, string $token): string {
-    if (strpos($uri, '?') !== false) {
-      return "{$uri}&access_token={$token}";
-    }
-
-    return "{$uri}?access_token={$token}";
-  }
-
   public function getPagerInfo(string $repo, string $state, string $token = null) {
     // Get first page.
-    $response = $this->get("repos/{$repo}/issues?state={$state}&per_page=100&page=1", $token);
+    $response = $this->get("repos/{$repo}/issues", [
+      'state' => $state,
+      'per_page' => 100,
+      'page' => 1,
+    ], $token);
     $data = json_decode($response->getBody()->getContents(), true);
 
     // If data is empty of json parsing failed.
@@ -85,7 +93,11 @@ class GitHubApi {
     $pagesCount = $matches[1];
 
     // Get last page.
-    $response = $this->get("repos/{$repo}/issues?state={$state}&per_page=100&page={$pagesCount}");
+    $response = $this->get("repos/{$repo}/issues", [
+      'state' => $state,
+      'per_page' => 100,
+      'page' => $pagesCount,
+    ], $token);
     $data = json_decode($response->getBody()->getContents(), true);
 
     if ((!isset($data)) || empty($data)) {
@@ -97,8 +109,26 @@ class GitHubApi {
     return new PagerInfo($pagesCount, $issuesCount);
   }
 
+  /**
+   * Gets issues list.
+   *
+   * @param string $repo
+   *   Repository.
+   * @param string $state
+   *   Issue state 'open' or 'closed'.
+   * @param int $page
+   *   Page number.
+   * @param string|null $token
+   *   Access token.
+   * @return array
+   *   List of issues.
+   */
   public function getIssuesList(string $repo, string $state, int $page = 1, string $token = null) {
-    $response = $this->get("repos/{$repo}/issues?state={$state}&per_page=100&page={$page}", $token);
+    $response = $this->get("repos/{$repo}/issues", [
+      'state' => $state,
+      'per_page' => 100,
+      'page' => $page,
+    ], $token);
     $data = json_decode($response->getBody()->getContents(), true);
 
     // If data is empty of json parsing failed.
