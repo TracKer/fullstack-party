@@ -142,18 +142,57 @@ class GitHubApi {
     }
 
     foreach ($data as &$issue) {
-      $issue['created_at'] = strtotime($issue['created_at']);
-      $issue['updated_at'] = strtotime($issue['updated_at']);
-      if (isset($issue['closed_at'])) {
-        $issue['closed_at'] = strtotime($issue['closed_at']);
-      }
-
-      foreach ($issue['labels'] as &$label) {
-        $label['text_color'] = self::getContrastColor(ltrim($label['color'], '#'));
-      }
+      self::processIssue($issue);
     }
 
     return $data;
+  }
+
+  public function getIssue(string $repo, string $id, string $token = null) {
+    $response = $this->get("/repos/{$repo}/issues/{$id}", [], $token);
+    $data = json_decode($response->getBody()->getContents(), true);
+
+    if ((!isset($data)) || empty($data)) {
+      // Error.
+      return [];
+    }
+
+    self::processIssue($data);
+
+    if ($data['comments'] > 0) {
+      $response = $this->get("/repos/{$repo}/issues/{$id}/comments", [], $token);
+      $comments = json_decode($response->getBody()->getContents(), true);
+
+      if ((!isset($data)) || empty($data)) {
+        $data['comments'] = [];
+      } else {
+        foreach ($comments as &$comment) {
+          self::processComment($comment);
+        }
+        $data['comments'] = $comments;
+      }
+    } else {
+      $data['comments'] = [];
+    }
+
+    return $data;
+  }
+
+  private static function processIssue(&$issue) {
+    $issue['created_at'] = strtotime($issue['created_at']);
+    $issue['updated_at'] = strtotime($issue['updated_at']);
+    if (isset($issue['closed_at'])) {
+      $issue['closed_at'] = strtotime($issue['closed_at']);
+    }
+
+    foreach ($issue['labels'] as &$label) {
+      $label['text_color'] = self::getContrastColor(ltrim($label['color'], '#'));
+    }
+  }
+
+  private static function processComment(&$comment) {
+    $comment['created_at'] = strtotime($comment['created_at']);
+    $comment['updated_at'] = strtotime($comment['updated_at']);
   }
 
   /**
