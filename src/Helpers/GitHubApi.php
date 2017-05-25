@@ -8,16 +8,20 @@ use GuzzleHttp\Psr7\Response;
 class GitHubApi {
   private $client;
   private $cache;
+  private $issuesPerPage;
 
   /**
    * GitHubApi constructor.
+   * @param array $config
+   *   Config.
    * @param Client $client
    *   Guzzle object.
    * @param ResponseCache $cache
    */
-  public function __construct(Client $client, ResponseCache $cache) {
+  public function __construct(array $config, Client $client, ResponseCache $cache) {
     $this->client = $client;
     $this->cache = $cache;
+    $this->issuesPerPage = isset($config['issues_per_page']) ? $config['issues_per_page'] : 30;
   }
 
   /**
@@ -68,7 +72,7 @@ class GitHubApi {
     // Get first page.
     $response = $this->get("repos/{$repo}/issues", [
       'state' => $state,
-      'per_page' => 100,
+      'per_page' => $this->issuesPerPage,
       'page' => 1,
     ], $token);
     $data = json_decode($response->getBody()->getContents(), true);
@@ -78,9 +82,10 @@ class GitHubApi {
       return new PagerInfo(0, 0);
     }
 
-    // If issues count on page less then 100, then it's amount of all items, and there is only one page.
+    // *IPP = $this->issuesPerPage
+    // If issues count on page less then IPP, then it's amount of all items, and there is only one page.
     // Or, if there is no Link header, the issues amount is the amount of issues on first page.
-    if ((count($data) < 100) || (!$response->hasHeader('Link'))) {
+    if ((count($data) < $this->issuesPerPage) || (!$response->hasHeader('Link'))) {
       return new PagerInfo(1,count($data));
     }
 
@@ -95,7 +100,7 @@ class GitHubApi {
     // Get last page.
     $response = $this->get("repos/{$repo}/issues", [
       'state' => $state,
-      'per_page' => 100,
+      'per_page' => $this->issuesPerPage,
       'page' => $pagesCount,
     ], $token);
     $data = json_decode($response->getBody()->getContents(), true);
@@ -105,7 +110,7 @@ class GitHubApi {
       return new PagerInfo(0, 0);
     }
 
-    $issuesCount = (($pagesCount - 1) * 100) + count($data);
+    $issuesCount = (($pagesCount - 1) * $this->issuesPerPage) + count($data);
     return new PagerInfo($pagesCount, $issuesCount);
   }
 
@@ -126,7 +131,7 @@ class GitHubApi {
   public function getIssuesList(string $repo, string $state, int $page = 1, string $token = null) {
     $response = $this->get("repos/{$repo}/issues", [
       'state' => $state,
-      'per_page' => 100,
+      'per_page' => $this->issuesPerPage,
       'page' => $page,
     ], $token);
     $data = json_decode($response->getBody()->getContents(), true);
