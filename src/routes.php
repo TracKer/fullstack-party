@@ -89,3 +89,8 @@ $app->get('/issue/{id}', function(ServerRequestInterface $request, ResponseInter
     'referer' => $referer,
   ]);
 });
+
+$app->get('/logout', function(ServerRequestInterface $request, ResponseInterface $response, $args) {
+  unset($_SESSION['token']);
+  return $response->withStatus(302)->withHeader('Location', '/');
+});
