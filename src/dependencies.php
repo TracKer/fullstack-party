@@ -14,7 +14,7 @@ $container['twig'] = function ($c) {
     'debug' => TRUE,
   ));
 
-  $twig->addExtension(new Twig_Extension_Debug());
+//  $twig->addExtension(new Twig_Extension_Debug());
   $twig->addExtension(new Twig_Extensions_Extension_Date());
 
   return $twig;
