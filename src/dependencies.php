@@ -34,11 +34,16 @@ $container['githubApi'] = function ($c) {
   );
 };
 
-// Error handler.
+// Error handlers.
 $container['errorHandler'] = function ($container) {
   return new \Helpers\ErrorHandler($container);
 };
 
 $container['phpErrorHandler'] = function ($container) {
   return new \Helpers\ErrorHandler($container);
+};
+
+// 404 handler.
+$container['notFoundHandler'] = function ($container) {
+  return new \Helpers\NotFoundHandler($container);
 };
