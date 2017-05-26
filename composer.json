@@ -8,7 +8,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Helpers\\": "src/Helpers/"
+            "Helpers\\": "src/Helpers/",
+            "Exception\\": "src/Exception"
         }
     }
 }

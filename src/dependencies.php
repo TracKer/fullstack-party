@@ -20,14 +20,21 @@ $container['twig'] = function ($c) {
   return $twig;
 };
 
+// Guzzle Client service.
 $container['guzzle'] = function ($c) {
   return new GuzzleHttp\Client($c->get('settings')['guzzle']);
 };
 
+// GitHub API service.
 $container['githubApi'] = function ($c) {
   return new \Helpers\GitHubApi(
     ['issues_per_page' => $c->get('settings')['github']['issues_per_page']],
     $c->get('guzzle'),
     new \Helpers\ResponseCache()
   );
+};
+
+// Error handler.
+$container['errorHandler'] = function ($container) {
+  return new \Helpers\ErrorHandler($container);
 };

@@ -5,8 +5,15 @@ namespace Helpers;
 use GuzzleHttp\Psr7\Response;
 
 class ResponseCache {
+  /**
+   * Cache data array.
+   * @var array
+   */
   private $cache;
 
+  /**
+   * ResponseCache constructor.
+   */
   public function __construct() {
     if (!isset($_SESSION['response_cache'])) {
       $_SESSION['response_cache'] = [];

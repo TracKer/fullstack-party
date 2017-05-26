@@ -1,7 +1,5 @@
 <?php
 
-use League\OAuth2\Client\Provider\Github;
-use League\OAuth2\Client\Provider\GithubResourceOwner;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -28,7 +26,7 @@ $app->get('/auth', function(ServerRequestInterface $request, ResponseInterface $
   elseif (!isset($query['state']) || ($query['state'] !== $_SESSION['last_state'])) {
     // If state is not the same as was sent to GitHub, the request must be aborted.
     unset($_SESSION['last_state']);
-    throw new Exception('Invalid state!');
+    throw new \Exception\AuthorizationFail('Invalid state received!');
   }
   else {
     // Try to get an access token using the temporary code.
@@ -50,7 +48,7 @@ $app->get('/auth', function(ServerRequestInterface $request, ResponseInterface $
     // If data is empty or json parsing failed.
     if (!isset($data['access_token'])) {
       unset($_SESSION['last_state']);
-      throw new Exception('Can not get access token!');
+      throw new \Exception\AuthorizationFail('Can not get access token from GitHub response!');
     }
 
     unset($_SESSION['last_state']);

@@ -2,7 +2,9 @@
 
 namespace Helpers;
 
+use Exception\ApiFail;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
 
 class GitHubApi {
@@ -35,6 +37,7 @@ class GitHubApi {
    *   Access token.
    * @return Response
    *   Data.
+   * @throws RequestException
    */
   public function get(string $uri, array $query = [], string $token = null): Response {
     ksort($query);
@@ -67,6 +70,8 @@ class GitHubApi {
    *   Access token.
    * @return PagerInfo
    *   Object with information about issues count and pages count.
+   * @throws RequestException
+   * @throws ApiFail
    */
   public function getPagerInfo(string $repo, string $state, string $token = null) {
     // Get first page.
@@ -92,7 +97,7 @@ class GitHubApi {
     preg_match('/<[^>]+[?&]page=(\d+)[^>]*>;\s*rel="last"/', reset($response->getHeader('Link')), $matches);
     if (!isset($matches[1])) {
       // Error.
-      return new PagerInfo(0, 0);
+      throw new ApiFail('Error occurred while parsing pagination data from response.');
     }
 
     $pagesCount = $matches[1];
@@ -107,7 +112,7 @@ class GitHubApi {
 
     if ((!isset($data)) || empty($data)) {
       // Error.
-      return new PagerInfo(0, 0);
+      throw new ApiFail('Error occurred while getting last page data.');
     }
 
     $issuesCount = (($pagesCount - 1) * $this->issuesPerPage) + count($data);
@@ -127,6 +132,7 @@ class GitHubApi {
    *   Access token.
    * @return array
    *   List of issues.
+   * @throws RequestException
    */
   public function getIssuesList(string $repo, string $state, int $page = 1, string $token = null) {
     $response = $this->get("repos/{$repo}/issues", [
@@ -148,13 +154,26 @@ class GitHubApi {
     return $data;
   }
 
+  /**
+   * Gets issue.
+   *
+   * @param string $repo
+   *   Repository.
+   * @param string $id
+   *   Issue ID.
+   * @param string|null $token
+   *   Access token.
+   * @return array
+   *   Issue data.
+   * @throws ApiFail
+   */
   public function getIssue(string $repo, string $id, string $token = null) {
     $response = $this->get("/repos/{$repo}/issues/{$id}", [], $token);
     $data = json_decode($response->getBody()->getContents(), true);
 
     if ((!isset($data)) || empty($data)) {
       // Error.
-      return [];
+      throw new ApiFail('Error occurred while getting issue data.');
     }
 
     self::processIssue($data);
@@ -178,6 +197,12 @@ class GitHubApi {
     return $data;
   }
 
+  /**
+   * Converts dates to time stamp, calculating text color on labels.
+   *
+   * @param array $issue
+   *   Issue data.
+   */
   private static function processIssue(&$issue) {
     $issue['created_at'] = strtotime($issue['created_at']);
     $issue['updated_at'] = strtotime($issue['updated_at']);
@@ -190,6 +215,12 @@ class GitHubApi {
     }
   }
 
+  /**
+   * Converts dates to time stamp.
+   *
+   * @param array $comment
+   *   Comment data.
+   */
   private static function processComment(&$comment) {
     $comment['created_at'] = strtotime($comment['created_at']);
     $comment['updated_at'] = strtotime($comment['updated_at']);
