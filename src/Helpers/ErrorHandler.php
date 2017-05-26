@@ -2,6 +2,7 @@
 
 namespace Helpers;
 
+use GuzzleHttp\Exception\RequestException;
 use Pimple\Container;
 
 class ErrorHandler {
@@ -15,25 +16,29 @@ class ErrorHandler {
     $this->container = $container;
   }
 
-  public function __invoke($request, $response, \Exception $exception) {
-    if ($exception instanceof \GuzzleHttp\Exception\RequestException) {
-      if (!$exception->hasResponse()) {
-        $errorText = nl2br($exception->getMessage());
-      } else {
-        $data = json_decode($exception->getResponse()->getBody()->getContents(), true);
-        if (!isset($data['message'])) {
+  public function __invoke($request, $response, $error) {
+    if ($error instanceof \Exception) {
+      $exception = $error;
+      if ($exception instanceof RequestException) {
+        if (!$exception->hasResponse()) {
           $errorText = nl2br($exception->getMessage());
         } else {
-          $errorText = nl2br($data['message']);
-          if (isset($data['documentation_url'])) {
-            $uri = $data['documentation_url'];
-            $errorText .= "<br>Please see more info here: <a href='{$uri}'>{$uri}</a>.";
+          $data = json_decode($exception->getResponse()->getBody()->getContents(), true);
+          if (!isset($data['message'])) {
+            $errorText = nl2br($exception->getMessage());
+          } else {
+            $errorText = nl2br($data['message']);
+            if (isset($data['documentation_url'])) {
+              $uri = $data['documentation_url'];
+              $errorText .= "<br>Please see more info here: <a href='{$uri}'>{$uri}</a>.";
+            }
           }
         }
+      } else {
+        $errorText = nl2br($exception->getMessage());
       }
-    }
-    else {
-      $errorText = nl2br($exception->getMessage());
+    } else {
+      $errorText = nl2br($error);
     }
 
     /** @var \Twig_Environment $twig */

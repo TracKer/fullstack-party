@@ -38,3 +38,7 @@ $container['githubApi'] = function ($c) {
 $container['errorHandler'] = function ($container) {
   return new \Helpers\ErrorHandler($container);
 };
+
+$container['phpErrorHandler'] = function ($container) {
+  return new \Helpers\ErrorHandler($container);
+};
