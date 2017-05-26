@@ -24,11 +24,10 @@ $container['guzzle'] = function ($c) {
   return new GuzzleHttp\Client($c->get('settings')['guzzle']);
 };
 
-$container['github'] = function ($c) {
-  $provider = new \League\OAuth2\Client\Provider\Github($c->get('settings')['github']);
-  return $provider;
-};
-
 $container['githubApi'] = function ($c) {
-  return new \Helpers\GitHubApi($c->get('settings')['github_api'], $c->get('guzzle'), new \Helpers\ResponseCache());
+  return new \Helpers\GitHubApi(
+    ['issues_per_page' => $c->get('settings')['github']['issues_per_page']],
+    $c->get('guzzle'),
+    new \Helpers\ResponseCache()
+  );
 };

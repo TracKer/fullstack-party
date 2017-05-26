@@ -9,24 +9,52 @@ use Psr\Http\Message\ServerRequestInterface;
 
 // GitHub authorization.
 $app->get('/auth', function(ServerRequestInterface $request, ResponseInterface $response, $args) {
-  /** @var Github $provider */
-  $provider = $this->github;
-
+  if (isset($_SESSION['token'])) {
+    return $response->withStatus(302)->withHeader('Location', '/issues/open');
+  }
   $query = $request->getQueryParams();
 
   if (!isset($query['code'])) {
-    $authUrl = $provider->getAuthorizationUrl();
-    $_SESSION['last_state'] = $provider->getState();
-    return $response->withStatus(302)->withHeader('Location', $authUrl);
+    // Redirect user to authorization page.
+    $_SESSION['last_state'] = md5(time() . 31337);
+    $requestQuery = [
+      'state' => $_SESSION['last_state'],
+      'redirect_uri' => 'http://tesonet-test.local/auth',
+      'client_id' => $this->settings['github']['clientId'],
+    ];
+    $uri = 'https://github.com/login/oauth/authorize?' . http_build_query($requestQuery);
+    return $response->withStatus(302)->withHeader('Location', $uri);
   }
-  elseif ((!isset($query['state'])) || ($query['state'] !== $_SESSION['last_state'])) {
+  elseif (!isset($query['state']) || ($query['state'] !== $_SESSION['last_state'])) {
+    // If state is not the same as was sent to GitHub, the request must be aborted.
     unset($_SESSION['last_state']);
     throw new Exception('Invalid state!');
   }
   else {
-    // Try to get an access token (using the authorization code grant).
-    $token = $provider->getAccessToken('authorization_code', ['code' => $query['code']]);
-    $_SESSION['token'] = $token;
+    // Try to get an access token using the temporary code.
+    $guzzle = new \GuzzleHttp\Client(['base_uri' => 'https://github.com/']);
+    $response = $guzzle->post('login/oauth/access_token', [
+      'headers' => [
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json'
+      ],
+      'body' => json_encode([
+        'client_id' => $this->settings['github']['clientId'],
+        'client_secret' => $this->settings['github']['clientSecret'],
+        'code' => $query['code'],
+        'state' => $_SESSION['last_state'],
+      ])
+    ]);
+    $data = json_decode($response->getBody()->getContents(), true);
+
+    // If data is empty or json parsing failed.
+    if (!isset($data['access_token'])) {
+      unset($_SESSION['last_state']);
+      throw new Exception('Can not get access token!');
+    }
+
+    unset($_SESSION['last_state']);
+    $_SESSION['token'] = $data['access_token'];
 
     return $response->withStatus(302)->withHeader('Location', '/issues/open');
   }
@@ -34,6 +62,10 @@ $app->get('/auth', function(ServerRequestInterface $request, ResponseInterface $
 
 // Front page.
 $app->get('/', function($request, $response, $args) {
+  if (isset($_SESSION['token'])) {
+    return $response->withStatus(302)->withHeader('Location', '/issues/open');
+  }
+
   /** @var Twig_Environment $twig */
   $twig = $this->twig;
   return $twig->render('index.html.twig', $args);

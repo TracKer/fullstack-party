@@ -21,10 +21,6 @@ return [
       'clientId' => '587b512a6831b5acae95',
       'clientSecret' => '170da7bfe3a52a13d249c956fc0f9e921ea4d147',
       'redirectUri' => 'http://tesonet-test.local/auth',
-    ],
-
-    // GitHub API
-    'github_api' => [
       'issues_per_page' => 30,
     ],
   ],
